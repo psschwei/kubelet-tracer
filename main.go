@@ -18,11 +18,16 @@ const (
 	plegRelist         = "GenericPLEG: Relisting"
 )
 
+type podlog struct {
+	Name      string `json:"name"`
+	Namespace string `json:"namespace"`
+}
+
 type message struct {
 	Timestamp float64  `json:"ts"`
 	Message   string   `json:"msg"`
-	Pod       string   `json:"pod"`
-	Pods      []string `json:"pods"`
+	Pod       podlog   `json:"pod"`
+	Pods      []podlog `json:"pods"`
 	Caller    string   `json:"caller"`
 }
 
@@ -59,7 +64,7 @@ func main() {
 			continue
 		}
 
-		if msg.Pod == pod {
+		if msg.Pod.Name == pod {
 			if stopAfterDeletion && msg.Message == msgContainerKilled {
 				break
 			}
@@ -70,7 +75,7 @@ func main() {
 		}
 
 		for _, podName := range msg.Pods {
-			if podName == pod {
+			if podName.Name == pod {
 				seenFirstPodMessage = true
 				msgs = append(msgs, msg)
 				break
